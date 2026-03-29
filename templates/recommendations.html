@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Recommendations</h2>
+
+<form method="GET" class="row g-3 mb-4">
+    <div class="col-md-6">
+        <input type="text" name="genre" class="form-control" placeholder="Enter genre">
+    </div>
+    <div class="col-md-4">
+        <input type="number" step="0.1" min="1" max="5" name="rating" class="form-control" placeholder="Minimum rating">
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-success w-100">Search</button>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Movie Name</th>
+            <th>Genre</th>
+            <th>Year</th>
+            <th>Rating</th>
+            <th>Review</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for movie in movies %}
+        <tr>
+            <td>{{ movie.movie_name }}</td>
+            <td>{{ movie.genre }}</td>
+            <td>{{ movie.release_year }}</td>
+            <td>{{ movie.rating }}</td>
+            <td>{{ movie.review }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
