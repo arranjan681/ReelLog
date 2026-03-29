@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Watchlist</h2>
+
+<form method="POST" class="mb-4">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.movie_name.label(class="form-label") }}
+        {{ form.movie_name(class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ form.genre.label(class="form-label") }}
+        {{ form.genre(class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ form.release_year.label(class="form-label") }}
+        {{ form.release_year(class="form-control") }}
+    </div>
+    {{ form.submit(class="btn btn-warning") }}
+</form>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Genre</th>
+            <th>Year</th>
+            <th>Added At</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.movie_name }}</td>
+            <td>{{ item.genre }}</td>
+            <td>{{ item.release_year }}</td>
+            <td>{{ item.added_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>
+                <a href="{{ url_for('delete_watchlist', id=item.id) }}" class="btn btn-danger btn-sm">Remove</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
