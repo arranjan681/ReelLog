@@ -1,46 +1,56 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Watchlist</h2>
+<div class="glass-card form-card mb-4">
+    <h2 class="section-title mb-4">My Watchlist</h2>
 
-<form method="POST" class="mb-4">
-    {{ form.hidden_tag() }}
-    <div class="mb-3">
-        {{ form.movie_name.label(class="form-label") }}
-        {{ form.movie_name(class="form-control") }}
-    </div>
-    <div class="mb-3">
-        {{ form.genre.label(class="form-label") }}
-        {{ form.genre(class="form-control") }}
-    </div>
-    <div class="mb-3">
-        {{ form.release_year.label(class="form-label") }}
-        {{ form.release_year(class="form-control") }}
-    </div>
-    {{ form.submit(class="btn btn-warning") }}
-</form>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                {{ form.movie_name.label(class="form-label text-light") }}
+                {{ form.movie_name(class="form-control custom-input", placeholder="Movie name") }}
+            </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Genre</th>
-            <th>Year</th>
-            <th>Added At</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in items %}
-        <tr>
-            <td>{{ item.movie_name }}</td>
-            <td>{{ item.genre }}</td>
-            <td>{{ item.release_year }}</td>
-            <td>{{ item.added_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-            <td>
-                <a href="{{ url_for('delete_watchlist', id=item.id) }}" class="btn btn-danger btn-sm">Remove</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+            <div class="col-md-4 mb-3">
+                {{ form.genre.label(class="form-label text-light") }}
+                {{ form.genre(class="form-control custom-input", placeholder="Genre") }}
+            </div>
+
+            <div class="col-md-4 mb-3">
+                {{ form.release_year.label(class="form-label text-light") }}
+                {{ form.release_year(class="form-control custom-input", placeholder="Release year") }}
+            </div>
+        </div>
+
+        {{ form.submit(class="btn btn-glow px-4") }}
+    </form>
+</div>
+
+<div class="row g-4">
+    {% for item in items %}
+    <div class="col-md-6 col-lg-4">
+        <div class="movie-card watchlist-card">
+            <div class="movie-poster-placeholder">📌</div>
+            <div class="movie-content">
+                <h4>{{ item.movie_name }}</h4>
+                <div class="movie-meta">
+                    <span class="genre-badge">{{ item.genre }}</span>
+                    <span class="year-badge">{{ item.release_year }}</span>
+                </div>
+                <p class="timestamp-text">
+                    Added on {{ item.added_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                </p>
+                <a href="{{ url_for('delete_watchlist', id=item.id) }}" class="btn btn-sm btn-danger">Remove</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not items %}
+<div class="empty-state">
+    <h4>Your watchlist is empty</h4>
+    <p>Add movies you want to watch later.</p>
+</div>
+{% endif %}
 {% endblock %}
