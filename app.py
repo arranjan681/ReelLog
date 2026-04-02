@@ -84,15 +84,10 @@ def logout():
     flash('You have been logged out.')
     return redirect(url_for('login'))
 
-
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    total_movies = Movie.query.filter_by(user_id=current_user.id).count()
-    total_watchlist = Watchlist.query.filter_by(user_id=current_user.id).count()
-    return render_template('dashboard.html', total_movies=total_movies, total_watchlist=total_watchlist)
-
-
+    return render_template('dashboard.html', total_movies=0, total_watchlist=0)
 
 
 @app.route('/movies')
