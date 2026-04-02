@@ -1,32 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>My Watched Movies</h2>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Genre</th>
-            <th>Year</th>
-            <th>Rating</th>
-            <th>Review</th>
-            <th>Timestamp</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for movie in movies %}
-        <tr>
-            <td>{{ movie.movie_name }}</td>
-            <td>{{ movie.genre }}</td>
-            <td>{{ movie.release_year }}</td>
-            <td>{{ movie.rating }}</td>
-            <td>{{ movie.review }}</td>
-            <td>{{ movie.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-            <td>
-                <a href="{{ url_for('delete_movie', id=movie.id) }}" class="btn btn-danger btn-sm">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<h2 class="section-title mb-4">My Watched Movies</h2>
+
+<div class="row g-4">
+    {% for movie in movies %}
+    <div class="col-md-6 col-lg-4">
+        <div class="movie-card">
+            <div class="movie-poster-placeholder">
+                🎬
+            </div>
+            <div class="movie-content">
+                <h4>{{ movie.movie_name }}</h4>
+                <div class="movie-meta">
+                    <span class="genre-badge">{{ movie.genre }}</span>
+                    <span class="year-badge">{{ movie.release_year }}</span>
+                </div>
+                <p class="rating-text">⭐ Rating: {{ movie.rating }}/5</p>
+                <p class="review-text">
+                    {{ movie.review if movie.review else 'No review added.' }}
+                </p>
+                <p class="timestamp-text">
+                    Added on {{ movie.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                </p>
+                <a href="{{ url_for('delete_movie', id=movie.id) }}" class="btn btn-sm btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not movies %}
+<div class="empty-state">
+    <h4>No watched movies yet</h4>
+    <p>Start building your cinema diary by adding your first movie.</p>
+</div>
+{% endif %}
 {% endblock %}
