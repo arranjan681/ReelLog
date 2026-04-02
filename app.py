@@ -98,15 +98,16 @@ def dashboard():
 def add_movie():
     form = MovieForm()
     if form.validate_on_submit():
-        movie = Movie(
-            user_id=current_user.id,
-            movie_name=form.movie_name.data,
-            genre=form.genre.data,
-            release_year=form.release_year.data,
-            rating=form.rating.data,
-            review=form.review.data,
-            timestamp=datetime.now()
-        )
+       movie = Movie(
+    user_id=current_user.id,
+    movie_name=form.movie_name.data,
+    genre=form.genre.data,
+    release_year=form.release_year.data,
+    rating=float(form.rating.data),
+    review=form.review.data,
+    poster_url=form.poster_url.data,
+    timestamp=datetime.now()
+)
         db.session.add(movie)
         db.session.commit()
         flash('Movie added successfully!')
