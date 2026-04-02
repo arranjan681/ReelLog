@@ -1,38 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="dashboard-hero mb-4">
-    <h1 class="page-title">Hello, {{ current_user.username }} 👋</h1>
-    <p class="page-subtitle">Track movies, rate your experience, and discover what to watch next.</p>
-</div>
-
-<div class="row g-4 mb-4">
-    <div class="col-md-6">
-        <div class="stat-card">
-            <div class="stat-icon">🎞️</div>
-            <div>
-                <h5>Total Watched Movies</h5>
-                <h2>{{ total_movies }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="stat-card">
-            <div class="stat-icon">📌</div>
-            <div>
-                <h5>Total Watchlist Movies</h5>
-                <h2>{{ total_watchlist }}</h2>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="feature-panel">
-    <h3 class="section-title">Quick Actions</h3>
-    <div class="quick-actions">
-        <a href="{{ url_for('add_movie') }}" class="quick-btn">+ Add Watched Movie</a>
-        <a href="{{ url_for('movies') }}" class="quick-btn">🎬 View My Movies</a>
-        <a href="{{ url_for('watchlist') }}" class="quick-btn">📌 Open Watchlist</a>
-        <a href="{{ url_for('recommendations') }}" class="quick-btn">⭐ Recommendations</a>
-    </div>
-</div>
+<h2>Welcome {{ current_user.username }}</h2>
+<p>Total Movies: {{ total_movies }}</p>
+<p>Total Watchlist: {{ total_watchlist }}</p>
 {% endblock %}
