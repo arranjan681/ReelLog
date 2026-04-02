@@ -1,28 +1,39 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Add Watched Movie</h2>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="mb-3">
-        {{ form.movie_name.label(class="form-label") }}
-        {{ form.movie_name(class="form-control") }}
-    </div>
-    <div class="mb-3">
-        {{ form.genre.label(class="form-label") }}
-        {{ form.genre(class="form-control") }}
-    </div>
-    <div class="mb-3">
-        {{ form.release_year.label(class="form-label") }}
-        {{ form.release_year(class="form-control") }}
-    </div>
-    <div class="mb-3">
-        {{ form.rating.label(class="form-label") }}
-        {{ form.rating(class="form-control") }}
-    </div>
-    <div class="mb-3">
-        {{ form.review.label(class="form-label") }}
-        {{ form.review(class="form-control") }}
-    </div>
-    {{ form.submit(class="btn btn-primary") }}
-</form>
+<div class="glass-card form-card">
+    <h2 class="section-title mb-4">Add Watched Movie</h2>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form.movie_name.label(class="form-label text-light") }}
+                {{ form.movie_name(class="form-control custom-input", placeholder="Movie name") }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                {{ form.genre.label(class="form-label text-light") }}
+                {{ form.genre(class="form-control custom-input", placeholder="Genre") }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                {{ form.release_year.label(class="form-label text-light") }}
+                {{ form.release_year(class="form-control custom-input", placeholder="Release year") }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                {{ form.rating.label(class="form-label text-light") }}
+                {{ form.rating(class="form-control custom-input", placeholder="Rating out of 5") }}
+            </div>
+
+            <div class="col-12 mb-3">
+                {{ form.review.label(class="form-label text-light") }}
+                {{ form.review(class="form-control custom-input", rows="4", placeholder="Write your review...") }}
+            </div>
+        </div>
+
+        {{ form.submit(class="btn btn-glow px-4") }}
+    </form>
+</div>
 {% endblock %}
