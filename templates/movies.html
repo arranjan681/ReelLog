@@ -6,22 +6,37 @@
     {% for movie in movies %}
     <div class="col-md-6 col-lg-4">
         <div class="movie-card">
-            <div class="movie-poster-placeholder">
-                🎬
-            </div>
+            {% if movie.poster_url %}
+                <img src="{{ movie.poster_url }}" alt="{{ movie.movie_name }}" class="movie-poster-img">
+            {% else %}
+                <div class="movie-poster-placeholder">🎬</div>
+            {% endif %}
+
             <div class="movie-content">
                 <h4>{{ movie.movie_name }}</h4>
+
                 <div class="movie-meta">
                     <span class="genre-badge">{{ movie.genre }}</span>
                     <span class="year-badge">{{ movie.release_year }}</span>
                 </div>
-                <p class="rating-text">⭐ Rating: {{ movie.rating }}/5</p>
+
+                <p class="star-display">
+                    {% if movie.rating == 1 %}★☆☆☆☆{% endif %}
+                    {% if movie.rating == 2 %}★★☆☆☆{% endif %}
+                    {% if movie.rating == 3 %}★★★☆☆{% endif %}
+                    {% if movie.rating == 4 %}★★★★☆{% endif %}
+                    {% if movie.rating == 5 %}★★★★★{% endif %}
+                    <span class="star-number">({{ movie.rating }}/5)</span>
+                </p>
+
                 <p class="review-text">
                     {{ movie.review if movie.review else 'No review added.' }}
                 </p>
+
                 <p class="timestamp-text">
                     Added on {{ movie.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
                 </p>
+
                 <a href="{{ url_for('delete_movie', id=movie.id) }}" class="btn btn-sm btn-danger">Delete</a>
             </div>
         </div>
