@@ -1,39 +1,48 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Recommendations</h2>
+<div class="glass-card form-card mb-4">
+    <h2 class="section-title mb-4">Movie Recommendations</h2>
 
-<form method="GET" class="row g-3 mb-4">
-    <div class="col-md-6">
-        <input type="text" name="genre" class="form-control" placeholder="Enter genre">
-    </div>
-    <div class="col-md-4">
-        <input type="number" step="0.1" min="1" max="5" name="rating" class="form-control" placeholder="Minimum rating">
-    </div>
-    <div class="col-md-2">
-        <button class="btn btn-success w-100">Search</button>
-    </div>
-</form>
+    <form method="GET">
+        <div class="row">
+            <div class="col-md-5 mb-3">
+                <input type="text" name="genre" class="form-control custom-input" placeholder="Enter genre">
+            </div>
+            <div class="col-md-5 mb-3">
+                <input type="number" step="0.1" min="1" max="5" name="rating" class="form-control custom-input" placeholder="Minimum rating">
+            </div>
+            <div class="col-md-2 mb-3">
+                <button class="btn btn-glow w-100">Search</button>
+            </div>
+        </div>
+    </form>
+</div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Movie Name</th>
-            <th>Genre</th>
-            <th>Year</th>
-            <th>Rating</th>
-            <th>Review</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for movie in movies %}
-        <tr>
-            <td>{{ movie.movie_name }}</td>
-            <td>{{ movie.genre }}</td>
-            <td>{{ movie.release_year }}</td>
-            <td>{{ movie.rating }}</td>
-            <td>{{ movie.review }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="row g-4">
+    {% for movie in movies %}
+    <div class="col-md-6 col-lg-4">
+        <div class="movie-card">
+            <div class="movie-poster-placeholder">⭐</div>
+            <div class="movie-content">
+                <h4>{{ movie.movie_name }}</h4>
+                <div class="movie-meta">
+                    <span class="genre-badge">{{ movie.genre }}</span>
+                    <span class="year-badge">{{ movie.release_year }}</span>
+                </div>
+                <p class="rating-text">⭐ Rating: {{ movie.rating }}/5</p>
+                <p class="review-text">
+                    {{ movie.review if movie.review else 'No review available.' }}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not movies %}
+<div class="empty-state">
+    <h4>No recommendations found</h4>
+    <p>Try another genre or a lower minimum rating.</p>
+</div>
+{% endif %}
 {% endblock %}
