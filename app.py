@@ -93,27 +93,6 @@ def dashboard():
     return render_template('dashboard.html', total_movies=total_movies, total_watchlist=total_watchlist)
 
 
-@app.route('/add_movie', methods=['GET', 'POST'])
-@login_required
-def add_movie():
-    form = MovieForm()
-    if form.validate_on_submit():
-       movie = Movie(
-    user_id=current_user.id,
-    movie_name=form.movie_name.data,
-    genre=form.genre.data,
-    release_year=form.release_year.data,
-    rating=float(form.rating.data),
-    review=form.review.data,
-    poster_url=form.poster_url.data,
-    timestamp=datetime.now()
-)
-        db.session.add(movie)
-        db.session.commit()
-        flash('Movie added successfully!')
-        return redirect(url_for('movies'))
-
-    return render_template('add_movie.html', form=form)
 
 
 @app.route('/movies')
@@ -122,27 +101,27 @@ def movies():
     user_movies = Movie.query.filter_by(user_id=current_user.id).order_by(Movie.timestamp.desc()).all()
     return render_template('movies.html', movies=user_movies)
 
-
-@app.route('/watchlist', methods=['GET', 'POST'])
+@app.route('/add_movie', methods=['GET', 'POST'])
 @login_required
-def watchlist():
-    form = WatchlistForm()
+def add_movie():
+    form = MovieForm()
     if form.validate_on_submit():
-        item = Watchlist(
+        movie = Movie(
             user_id=current_user.id,
             movie_name=form.movie_name.data,
             genre=form.genre.data,
             release_year=form.release_year.data,
-            added_at=datetime.now()
+            rating=float(form.rating.data),
+            review=form.review.data,
+            poster_url=form.poster_url.data,
+            timestamp=datetime.now()
         )
-        db.session.add(item)
+        db.session.add(movie)
         db.session.commit()
-        flash('Movie added to watchlist!')
-        return redirect(url_for('watchlist'))
+        flash('Movie added successfully!')
+        return redirect(url_for('movies'))
 
-    items = Watchlist.query.filter_by(user_id=current_user.id).order_by(Watchlist.added_at.desc()).all()
-    return render_template('watchlist.html', form=form, items=items)
-
+    return render_template('add_movie.html', form=form)
 
 @app.route('/recommendations')
 @login_required
