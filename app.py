@@ -13,8 +13,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///movies.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
-with app.app_context():
-    db.create_all() 
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -84,17 +82,14 @@ def logout():
     flash('You have been logged out.')
     return redirect(url_for('login'))
 
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', total_movies=0, total_watchlist=0)
+    total_movies = Movie.query.filter_by(user_id=current_user.id).count()
+    total_watchlist = Watchlist.query.filter_by(user_id=current_user.id).count()
+    return render_template('dashboard.html', total_movies=total_movies, total_watchlist=total_watchlist)
 
-
-@app.route('/movies')
-@login_required
-def movies():
-    user_movies = Movie.query.filter_by(user_id=current_user.id).order_by(Movie.timestamp.desc()).all()
-    return render_template('movies.html', movies=user_movies)
 
 @app.route('/add_movie', methods=['GET', 'POST'])
 @login_required
@@ -106,9 +101,8 @@ def add_movie():
             movie_name=form.movie_name.data,
             genre=form.genre.data,
             release_year=form.release_year.data,
-            rating=float(form.rating.data),
+            rating=form.rating.data,
             review=form.review.data,
-            poster_url=form.poster_url.data,
             timestamp=datetime.now()
         )
         db.session.add(movie)
@@ -117,6 +111,35 @@ def add_movie():
         return redirect(url_for('movies'))
 
     return render_template('add_movie.html', form=form)
+
+
+@app.route('/movies')
+@login_required
+def movies():
+    user_movies = Movie.query.filter_by(user_id=current_user.id).order_by(Movie.timestamp.desc()).all()
+    return render_template('movies.html', movies=user_movies)
+
+
+@app.route('/watchlist', methods=['GET', 'POST'])
+@login_required
+def watchlist():
+    form = WatchlistForm()
+    if form.validate_on_submit():
+        item = Watchlist(
+            user_id=current_user.id,
+            movie_name=form.movie_name.data,
+            genre=form.genre.data,
+            release_year=form.release_year.data,
+            added_at=datetime.now()
+        )
+        db.session.add(item)
+        db.session.commit()
+        flash('Movie added to watchlist!')
+        return redirect(url_for('watchlist'))
+
+    items = Watchlist.query.filter_by(user_id=current_user.id).order_by(Watchlist.added_at.desc()).all()
+    return render_template('watchlist.html', form=form, items=items)
+
 
 @app.route('/recommendations')
 @login_required
@@ -171,3 +194,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
+
