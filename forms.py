@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, IntegerField, FloatField, TextAreaField
-from wtforms.validators import DataRequired, Length, NumberRange
+from wtforms import StringField, PasswordField, SubmitField, IntegerField, TextAreaField, SelectField
+from wtforms.validators import DataRequired, Length
 
 
 class RegisterForm(FlaskForm):
@@ -19,7 +19,20 @@ class MovieForm(FlaskForm):
     movie_name = StringField('Movie Name', validators=[DataRequired()])
     genre = StringField('Genre', validators=[DataRequired()])
     release_year = IntegerField('Release Year', validators=[DataRequired()])
-    rating = FloatField('Rating (1 to 5)', validators=[DataRequired(), NumberRange(min=1, max=5)])
+
+    rating = SelectField(
+        'Rating',
+        choices=[
+            ('1', '★☆☆☆☆ (1/5)'),
+            ('2', '★★☆☆☆ (2/5)'),
+            ('3', '★★★☆☆ (3/5)'),
+            ('4', '★★★★☆ (4/5)'),
+            ('5', '★★★★★ (5/5)')
+        ],
+        validators=[DataRequired()]
+    )
+
+    poster_url = StringField('Poster URL')
     review = TextAreaField('Review')
     submit = SubmitField('Add Movie')
 
