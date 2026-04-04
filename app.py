@@ -1,5 +1,4 @@
 from flask import Flask, render_template, redirect, url_for, flash, request
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -8,11 +7,14 @@ from models import db, User, Movie, Watchlist
 from forms import RegisterForm, LoginForm, MovieForm, WatchlistForm
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key_here'
+app.config['SECRET_KEY'] = 'movie_app_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///movies.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -35,10 +37,12 @@ def register():
         return redirect(url_for('dashboard'))
 
     form = RegisterForm()
+
     if form.validate_on_submit():
         existing_user = User.query.filter_by(username=form.username.data).first()
+
         if existing_user:
-            flash('Username already exists. Please choose another.')
+            flash('Username already exists. Try another one.')
             return redirect(url_for('register'))
 
         hashed_password = generate_password_hash(form.password.data)
@@ -47,6 +51,7 @@ def register():
             username=form.username.data,
             password=hashed_password
         )
+
         db.session.add(user)
         db.session.commit()
 
@@ -62,6 +67,7 @@ def login():
         return redirect(url_for('dashboard'))
 
     form = LoginForm()
+
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
 
@@ -79,7 +85,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out.')
+    flash('Logged out successfully.')
     return redirect(url_for('login'))
 
 
@@ -95,18 +101,22 @@ def dashboard():
 @login_required
 def add_movie():
     form = MovieForm()
+
     if form.validate_on_submit():
         movie = Movie(
             user_id=current_user.id,
             movie_name=form.movie_name.data,
             genre=form.genre.data,
             release_year=form.release_year.data,
-            rating=form.rating.data,
+            rating=float(form.rating.data),
             review=form.review.data,
+            poster_url=form.poster_url.data,
             timestamp=datetime.now()
         )
+
         db.session.add(movie)
         db.session.commit()
+
         flash('Movie added successfully!')
         return redirect(url_for('movies'))
 
@@ -120,46 +130,6 @@ def movies():
     return render_template('movies.html', movies=user_movies)
 
 
-@app.route('/watchlist', methods=['GET', 'POST'])
-@login_required
-def watchlist():
-    form = WatchlistForm()
-    if form.validate_on_submit():
-        item = Watchlist(
-            user_id=current_user.id,
-            movie_name=form.movie_name.data,
-            genre=form.genre.data,
-            release_year=form.release_year.data,
-            added_at=datetime.now()
-        )
-        db.session.add(item)
-        db.session.commit()
-        flash('Movie added to watchlist!')
-        return redirect(url_for('watchlist'))
-
-    items = Watchlist.query.filter_by(user_id=current_user.id).order_by(Watchlist.added_at.desc()).all()
-    return render_template('watchlist.html', form=form, items=items)
-
-
-@app.route('/recommendations')
-@login_required
-def recommendations():
-    genre = request.args.get('genre')
-    min_rating = request.args.get('rating', type=float)
-
-    query = Movie.query.filter(Movie.user_id == current_user.id)
-
-    if genre:
-        query = query.filter(Movie.genre.ilike(f'%{genre}%'))
-
-    if min_rating is not None:
-        query = query.filter(Movie.rating >= min_rating)
-
-    recommended_movies = query.order_by(Movie.rating.desc(), Movie.timestamp.desc()).all()
-
-    return render_template('recommendations.html', movies=recommended_movies)
-
-
 @app.route('/delete_movie/<int:id>')
 @login_required
 def delete_movie(id):
@@ -171,8 +141,33 @@ def delete_movie(id):
 
     db.session.delete(movie)
     db.session.commit()
-    flash('Movie deleted successfully!')
+
+    flash('Movie deleted successfully.')
     return redirect(url_for('movies'))
+
+
+@app.route('/watchlist', methods=['GET', 'POST'])
+@login_required
+def watchlist():
+    form = WatchlistForm()
+
+    if form.validate_on_submit():
+        item = Watchlist(
+            user_id=current_user.id,
+            movie_name=form.movie_name.data,
+            genre=form.genre.data,
+            release_year=form.release_year.data,
+            added_at=datetime.now()
+        )
+
+        db.session.add(item)
+        db.session.commit()
+
+        flash('Movie added to watchlist.')
+        return redirect(url_for('watchlist'))
+
+    items = Watchlist.query.filter_by(user_id=current_user.id).order_by(Watchlist.added_at.desc()).all()
+    return render_template('watchlist.html', form=form, items=items)
 
 
 @app.route('/delete_watchlist/<int:id>')
@@ -186,12 +181,31 @@ def delete_watchlist(id):
 
     db.session.delete(item)
     db.session.commit()
-    flash('Watchlist movie removed!')
+
+    flash('Removed from watchlist.')
     return redirect(url_for('watchlist'))
 
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+@app.route('/recommendations')
+@login_required
+def recommendations():
+    genre = request.args.get('genre', '')
+    min_rating = request.args.get('rating', '')
 
+    query = Movie.query.filter_by(user_id=current_user.id)
+
+    if genre:
+        query = query.filter(Movie.genre.ilike(f'%{genre}%'))
+
+    if min_rating:
+        try:
+            query = query.filter(Movie.rating >= float(min_rating))
+        except ValueError:
+            pass
+
+    movies = query.order_by(Movie.rating.desc(), Movie.timestamp.desc()).all()
+    return render_template('recommendations.html', movies=movies)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
