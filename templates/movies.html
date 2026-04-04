@@ -1,38 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2 class="section-title mb-4">My Watched Movies</h2>
+<h2>My Watched Movies</h2>
 
-<div class="row g-4">
+<div class="movie-grid">
     {% for movie in movies %}
-    <div class="col-md-6 col-lg-4">
-        <div class="movie-card">
-            <div class="movie-poster-placeholder">
-                🎬
-            </div>
-            <div class="movie-content">
-                <h4>{{ movie.movie_name }}</h4>
-                <div class="movie-meta">
-                    <span class="genre-badge">{{ movie.genre }}</span>
-                    <span class="year-badge">{{ movie.release_year }}</span>
-                </div>
-                <p class="rating-text">⭐ Rating: {{ movie.rating }}/5</p>
-                <p class="review-text">
-                    {{ movie.review if movie.review else 'No review added.' }}
-                </p>
-                <p class="timestamp-text">
-                    Added on {{ movie.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
-                </p>
-                <a href="{{ url_for('delete_movie', id=movie.id) }}" class="btn btn-sm btn-danger">Delete</a>
-            </div>
+    <div class="movie-card">
+        {% if movie.poster_url %}
+            <img src="{{ movie.poster_url }}" alt="{{ movie.movie_name }}" class="movie-poster">
+        {% else %}
+            <div class="poster-placeholder">🎬</div>
+        {% endif %}
+
+        <div class="movie-content">
+            <h4>{{ movie.movie_name }}</h4>
+            <p><strong>Genre:</strong> {{ movie.genre }}</p>
+            <p><strong>Year:</strong> {{ movie.release_year }}</p>
+            <p><strong>Rating:</strong>
+                {% if movie.rating == 1 %}★☆☆☆☆{% endif %}
+                {% if movie.rating == 2 %}★★☆☆☆{% endif %}
+                {% if movie.rating == 3 %}★★★☆☆{% endif %}
+                {% if movie.rating == 4 %}★★★★☆{% endif %}
+                {% if movie.rating == 5 %}★★★★★{% endif %}
+            </p>
+            <p><strong>Review:</strong> {{ movie.review if movie.review else 'No review' }}</p>
+            <p><strong>Added:</strong> {{ movie.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+
+            <a href="{{ url_for('delete_movie', id=movie.id) }}" class="btn btn-danger btn-sm">Delete</a>
         </div>
     </div>
     {% endfor %}
 </div>
 
 {% if not movies %}
-<div class="empty-state">
-    <h4>No watched movies yet</h4>
-    <p>Start building your cinema diary by adding your first movie.</p>
-</div>
+<p>No watched movies yet.</p>
 {% endif %}
 {% endblock %}
