@@ -1,32 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="auth-wrapper">
-    <div class="auth-card">
-        <h2 class="auth-title">Welcome Back</h2>
-        <p class="auth-subtitle">Login to continue your movie journey</p>
+<div class="form-box">
+    <h2>Login</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
 
-        <form method="POST">
-            {{ form.hidden_tag() }}
-
-            <div class="mb-3">
-                {{ form.username.label(class="form-label text-light") }}
-                {{ form.username(class="form-control custom-input", placeholder="Enter username") }}
-            </div>
-
-            <div class="mb-3">
-                {{ form.password.label(class="form-label text-light") }}
-                {{ form.password(class="form-control custom-input", placeholder="Enter password") }}
-            </div>
-
-            <div class="d-grid">
-                {{ form.submit(class="btn btn-glow") }}
-            </div>
-        </form>
-
-        <div class="auth-footer">
-            <span>Don’t have an account?</span>
-            <a href="{{ url_for('register') }}">Register</a>
+        <div class="mb-3">
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control", placeholder="Enter username") }}
         </div>
-    </div>
+
+        <div class="mb-3">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control", placeholder="Enter password") }}
+        </div>
+
+        {{ form.submit(class="btn btn-success") }}
+        <a href="{{ url_for('register') }}" class="btn btn-link">Create account</a>
+    </form>
 </div>
 {% endblock %}
