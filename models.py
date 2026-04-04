@@ -18,6 +18,7 @@ class Movie(db.Model):
     release_year = db.Column(db.Integer, nullable=False)
     rating = db.Column(db.Float, nullable=False)
     review = db.Column(db.Text, nullable=True)
+    poster_url = db.Column(db.String(500), nullable=True)
     timestamp = db.Column(db.DateTime, nullable=False)
 
 
