@@ -1,37 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>My Watched Movies</h2>
 
-<div class="movie-grid">
+<h2 class="mb-4">My Movies</h2>
+
+{% if movies %}
+<div class="row">
     {% for movie in movies %}
-    <div class="movie-card">
-        {% if movie.poster_url %}
-            <img src="{{ movie.poster_url }}" alt="{{ movie.movie_name }}" class="movie-poster">
-        {% else %}
-            <div class="poster-placeholder">🎬</div>
-        {% endif %}
+    <div class="col-md-4 mb-4">
+        <div class="card bg-secondary text-light p-3">
 
-        <div class="movie-content">
             <h4>{{ movie.movie_name }}</h4>
             <p><strong>Genre:</strong> {{ movie.genre }}</p>
-            <p><strong>Year:</strong> {{ movie.release_year }}</p>
-            <p><strong>Rating:</strong>
-                {% if movie.rating == 1 %}★☆☆☆☆{% endif %}
-                {% if movie.rating == 2 %}★★☆☆☆{% endif %}
-                {% if movie.rating == 3 %}★★★☆☆{% endif %}
-                {% if movie.rating == 4 %}★★★★☆{% endif %}
-                {% if movie.rating == 5 %}★★★★★{% endif %}
-            </p>
-            <p><strong>Review:</strong> {{ movie.review if movie.review else 'No review' }}</p>
-            <p><strong>Added:</strong> {{ movie.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p><strong>Release Year:</strong> {{ movie.release_year }}</p>
+            <p><strong>Rating:</strong> ⭐ {{ movie.rating }}/10</p>
+            <p><strong>Review:</strong> {{ movie.review }}</p>
+            <p class="text-muted"><small>Added: {{ movie.timestamp }}</small></p>
 
-            <a href="{{ url_for('delete_movie', id=movie.id) }}" class="btn btn-danger btn-sm">Delete</a>
         </div>
     </div>
     {% endfor %}
 </div>
 
-{% if not movies %}
-<p>No watched movies yet.</p>
+{% else %}
+<p>No movies added yet.</p>
 {% endif %}
+
 {% endblock %}
