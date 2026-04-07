@@ -1,38 +1,32 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2 class="mb-4">Add Movie</h2>
+{% extends "base.html" %}
+{% block title %}Add Movie{% endblock %}
 
-<form method="POST">
+{% block content %}
+<h2>Add New Movie</h2>
+
+<form method="POST" class="form-card">
     {{ form.hidden_tag() }}
 
-    <div class="mb-3">
-        {{ form.movie_name.label(class="form-label") }}
-        {{ form.movie_name(class="form-control") }}
+    <div class="form-group">
+        {{ form.title.label }}  
+        {{ form.title(class="input-field") }}
     </div>
 
-    <div class="mb-3">
-        {{ form.genre.label(class="form-label") }}
-        {{ form.genre(class="form-control") }}
+    <div class="form-group">
+        {{ form.release_date.label }}
+        {{ form.release_date(class="input-field") }}
     </div>
 
-    <div class="mb-3">
-        {{ form.release_year.label(class="form-label") }}
-        {{ form.release_year(class="form-control") }}
+    <div class="form-group">
+        {{ form.rating.label }}
+        {{ form.rating(class="input-field") }}
     </div>
 
-    <div class="mb-3">
-        {{ form.rating.label(class="form-label") }}
-        {{ form.rating(class="form-control") }}
+    <div class="form-group">
+        {{ form.description.label }}
+        {{ form.description(class="input-field textarea") }}
     </div>
 
-    <div class="mb-3">
-        {{ form.review.label(class="form-label") }}
-        {{ form.review(class="form-control") }}
-    </div>
-
-    <div class="d-grid">
-        {{ form.submit(class="btn btn-success") }}
-    </div>
+    <button type="submit" class="button primary">Add Movie</button>
 </form>
-
 {% endblock %}
