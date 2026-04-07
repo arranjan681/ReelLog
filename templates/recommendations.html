@@ -1,28 +1,47 @@
-{% extends "base.html" %}
-{% block title %}Recommendations{% endblock %}
-
+{% extends 'base.html' %}
 {% block content %}
-<h2 class="page-title">Recommended For You</h2>
 
-{% if recommendations %}
-    <div class="movie-grid">
-        {% for movie in recommendations %}
-            <div class="card movie-card">
-                <h3>{{ movie.title }}</h3>
+<h2 class="page-title">🎯 Recommended Movies</h2>
 
-                <p class="small-text">{{ movie.description[:120] }}...</p>
+<p class="text-muted">
+    These recommendations are based on your favorite genres and highest-rated movies.
+</p>
 
-                <div class="button-group">
-                    <a href="{{ url_for('add_to_watchlist', movie_id=movie.id) }}" 
-                       class="button primary">
-                       Add to Watchlist
-                    </a>
-                </div>
+<div class="movies-grid">
+
+    {% if movies %}
+        {% for movie in movies %}
+        <div class="movie-card">
+
+            <div class="poster-box">
+                {% if movie.poster %}
+                    <img src="{{ movie.poster }}" class="movie-poster">
+                {% else %}
+                    <img src="{{ url_for('static', filename='default_poster.jpg') }}" class="movie-poster">
+                {% endif %}
             </div>
+
+            <div class="movie-info">
+                <h4>{{ movie.title }}</h4>
+                <p class="genre">{{ movie.genre }}</p>
+
+                <div class="star-rating">
+                    {% for _ in range(movie.rating) %} ⭐ {% endfor %}
+                    {% for _ in range(5 - movie.rating) %} ☆ {% endfor %}
+                </div>
+
+                <a href="{{ url_for('movie_details', movie_id=movie.id) }}" 
+                   class="btn btn-outline-primary mt-2 w-100">
+                    View Details
+                </a>
+
+            </div>
+        </div>
         {% endfor %}
-    </div>
-{% else %}
-    <p>No recommendations available.</p>
-{% endif %}
+    {% else %}
+        <p class="text-muted">No recommendations available yet.</p>
+    {% endif %}
+
+</div>
 
 {% endblock %}
