@@ -1,30 +1,26 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, IntegerField, TextAreaField
-from wtforms.validators import InputRequired, Length
-
+from wtforms import StringField, PasswordField, IntegerField, TextAreaField, SelectField, SubmitField
+from wtforms.validators import InputRequired, Length, NumberRange
 
 class RegisterForm(FlaskForm):
-    username = StringField("Username", validators=[InputRequired(), Length(min=3, max=20)])
-    password = PasswordField("Password", validators=[InputRequired(), Length(min=4, max=30)])
+    username = StringField("Username", validators=[InputRequired()])
+    password = PasswordField("Password", validators=[InputRequired(), Length(min=4)])
     submit = SubmitField("Register")
-
 
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[InputRequired()])
     password = PasswordField("Password", validators=[InputRequired()])
     submit = SubmitField("Login")
 
-
 class MovieForm(FlaskForm):
-    movie_name = StringField("Movie Name", validators=[InputRequired()])
+    title = StringField("Movie Title", validators=[InputRequired()])
     genre = StringField("Genre", validators=[InputRequired()])
-    release_year = StringField("Release Year", validators=[InputRequired()])
-    rating = IntegerField("Rating (1–5)", validators=[InputRequired()])
+    rating = IntegerField("Rating (1–5)", validators=[InputRequired(), NumberRange(min=1, max=5)])
     review = TextAreaField("Review")
+    poster = StringField("Poster URL")
     submit = SubmitField("Add Movie")
 
-
-class WatchlistForm(FlaskForm):
-    movie_name = StringField("Movie Name", validators=[InputRequired()])
-    genre = StringField("Genre", validators=[InputRequired()])
-    submit = SubmitField("Add to Watchlist")
+class SearchForm(FlaskForm):
+    search = StringField("Movie Title")
+    genre = SelectField("Genre", choices=["All", "Action", "Comedy", "Drama", "Horror", "Sci-Fi"])
+    submit = SubmitField("Search")
