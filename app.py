@@ -1,24 +1,23 @@
 from flask import Flask, render_template, redirect, url_for, flash, request
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
-
-from models import db, User, Movie, Watchlist
-from forms import RegisterForm, LoginForm, MovieForm, WatchlistForm
+from forms import RegisterForm, LoginForm, MovieForm, SearchForm
+from models import db, User, Movie
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'movie_app_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///movies.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SECRET_KEY"] = "mysecretkey"
+
+# For local SQLite
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies.db"
+
+# For Render PostgreSQL (uncomment later)
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 
 db.init_app(app)
 
-with app.app_context():
-    db.create_all()
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager = LoginManager(app)
+login_manager.login_view = "login"
 
 
 @login_manager.user_loader
@@ -26,186 +25,122 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-@app.route('/')
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
+
+@app.route("/")
 def home():
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
-
-    form = RegisterForm()
-
-    if form.validate_on_submit():
-        existing_user = User.query.filter_by(username=form.username.data).first()
-
-        if existing_user:
-            flash('Username already exists. Try another one.')
-            return redirect(url_for('register'))
-
-        hashed_password = generate_password_hash(form.password.data)
-
-        user = User(
-            username=form.username.data,
-            password=hashed_password
-        )
-
-        db.session.add(user)
-        db.session.commit()
-
-        flash('Registration successful! Please login.')
-        return redirect(url_for('login'))
-
-    return render_template('register.html', form=form)
-
-
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
-
     form = LoginForm()
-
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
 
-        if user and check_password_hash(user.password, form.password.data):
+        if user and user.check_password(form.password.data):
             login_user(user)
-            flash('Login successful!')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for("dashboard"))
         else:
-            flash('Invalid username or password.')
-
-    return render_template('login.html', form=form)
-
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    flash('Logged out successfully.')
-    return redirect(url_for('login'))
+            flash("Invalid username or password")
+    return render_template("login.html", form=form)
 
 
-@app.route('/dashboard')
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data)
+        user.set_password(form.password.data)
+
+        db.session.add(user)
+        db.session.commit()
+        flash("Registration successful! Please login.")
+        return redirect(url_for("login"))
+    return render_template("register.html", form=form)
+
+
+@app.route("/dashboard")
 @login_required
 def dashboard():
-    total_movies = Movie.query.filter_by(user_id=current_user.id).count()
-    total_watchlist = Watchlist.query.filter_by(user_id=current_user.id).count()
-    return render_template('dashboard.html', total_movies=total_movies, total_watchlist=total_watchlist)
+    return render_template("dashboard.html")
 
 
-@app.route('/add_movie', methods=['GET', 'POST'])
+@app.route("/add_movie", methods=["GET", "POST"])
 @login_required
 def add_movie():
     form = MovieForm()
-
     if form.validate_on_submit():
         movie = Movie(
-            user_id=current_user.id,
-            movie_name=form.movie_name.data,
+            title=form.title.data,
             genre=form.genre.data,
-            release_year=form.release_year.data,
-            rating=float(form.rating.data),
+            rating=form.rating.data,
             review=form.review.data,
-            poster_url=form.poster_url.data,
-            timestamp=datetime.now()
+            poster=form.poster.data,
+            user_id=current_user.id,
         )
-
         db.session.add(movie)
         db.session.commit()
-
-        flash('Movie added successfully!')
-        return redirect(url_for('movies'))
-
-    return render_template('add_movie.html', form=form)
+        flash("Movie added!")
+        return redirect(url_for("movies"))
+    return render_template("add_movie.html", form=form)
 
 
-@app.route('/movies')
+@app.route("/movies")
 @login_required
 def movies():
-    user_movies = Movie.query.filter_by(user_id=current_user.id).order_by(Movie.timestamp.desc()).all()
-    return render_template('movies.html', movies=user_movies)
+    user_movies = Movie.query.filter_by(user_id=current_user.id).all()
+    return render_template("movies.html", movies=user_movies)
 
 
-@app.route('/delete_movie/<int:id>')
+@app.route("/movie/<int:movie_id>")
 @login_required
-def delete_movie(id):
-    movie = Movie.query.get_or_404(id)
-
-    if movie.user_id != current_user.id:
-        flash('Unauthorized access.')
-        return redirect(url_for('movies'))
-
-    db.session.delete(movie)
-    db.session.commit()
-
-    flash('Movie deleted successfully.')
-    return redirect(url_for('movies'))
+def movie_details(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    return render_template("movie_details.html", movie=movie)
 
 
-@app.route('/watchlist', methods=['GET', 'POST'])
+@app.route("/watchlist")
 @login_required
 def watchlist():
-    form = WatchlistForm()
+    movies = Movie.query.filter_by(user_id=current_user.id).all()
+    return render_template("watchlist.html", movies=movies)
+
+
+@app.route("/search", methods=["GET", "POST"])
+@login_required
+def search():
+    form = SearchForm()
+    movies = []
 
     if form.validate_on_submit():
-        item = Watchlist(
-            user_id=current_user.id,
-            movie_name=form.movie_name.data,
-            genre=form.genre.data,
-            release_year=form.release_year.data,
-            added_at=datetime.now()
-        )
+        title = form.search.data
+        genre = form.genre.data
 
-        db.session.add(item)
-        db.session.commit()
+        movies = Movie.query.filter(
+            Movie.title.ilike(f"%{title}%"),
+            Movie.genre.ilike(f"%{genre}%") if genre != "All" else True,
+            Movie.user_id == current_user.id
+        ).all()
 
-        flash('Movie added to watchlist.')
-        return redirect(url_for('watchlist'))
-
-    items = Watchlist.query.filter_by(user_id=current_user.id).order_by(Watchlist.added_at.desc()).all()
-    return render_template('watchlist.html', form=form, items=items)
+    return render_template("search.html", form=form, movies=movies)
 
 
-@app.route('/delete_watchlist/<int:id>')
-@login_required
-def delete_watchlist(id):
-    item = Watchlist.query.get_or_404(id)
-
-    if item.user_id != current_user.id:
-        flash('Unauthorized access.')
-        return redirect(url_for('watchlist'))
-
-    db.session.delete(item)
-    db.session.commit()
-
-    flash('Removed from watchlist.')
-    return redirect(url_for('watchlist'))
-
-
-@app.route('/recommendations')
+@app.route("/recommendations")
 @login_required
 def recommendations():
-    genre = request.args.get('genre', '')
-    min_rating = request.args.get('rating', '')
-
-    query = Movie.query.filter_by(user_id=current_user.id)
-
-    if genre:
-        query = query.filter(Movie.genre.ilike(f'%{genre}%'))
-
-    if min_rating:
-        try:
-            query = query.filter(Movie.rating >= float(min_rating))
-        except ValueError:
-            pass
-
-    movies = query.order_by(Movie.rating.desc(), Movie.timestamp.desc()).all()
-    return render_template('recommendations.html', movies=movies)
+    movies = Movie.query.filter_by(user_id=current_user.id).order_by(Movie.rating.desc()).all()
+    return render_template("recommendations.html", movies=movies)
 
 
-if __name__ == '__main__':
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
+
+if __name__ == "__main__":
     app.run(debug=True)
