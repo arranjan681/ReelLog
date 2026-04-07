@@ -1,9 +1,31 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Welcome {{ current_user.username }}</h1>
 
-<div class="stats-box">
-    <p><strong>Total Movies:</strong> {{ total_movies }}</p>
-    <p><strong>Total Watchlist:</strong> {{ total_watchlist }}</p>
+<h2 class="mb-4">Welcome, {{ current_user.username }} 👋</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card bg-secondary text-light p-3">
+            <h4>Total Movies</h4>
+            <h2>{{ total_movies }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-secondary text-light p-3">
+            <h4>Watchlist Items</h4>
+            <h2>{{ total_watchlist }}</h2>
+        </div>
+    </div>
 </div>
+
+<hr class="my-4">
+
+<h4>Quick Actions</h4>
+
+<a href="{{ url_for('add_movie') }}" class="btn btn-primary me-2">Add Movie</a>
+<a href="{{ url_for('movies') }}" class="btn btn-warning me-2">My Movies</a>
+<a href="{{ url_for('watchlist') }}" class="btn btn-info me-2">Watchlist</a>
+<a href="{{ url_for('recommendations') }}" class="btn btn-success">Recommendations</a>
+
 {% endblock %}
