@@ -1,38 +1,28 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% block title %}Recommendations{% endblock %}
+
 {% block content %}
+<h2 class="page-title">Recommended For You</h2>
 
-<h2 class="mb-3">Movie Recommendations</h2>
+{% if recommendations %}
+    <div class="movie-grid">
+        {% for movie in recommendations %}
+            <div class="card movie-card">
+                <h3>{{ movie.title }}</h3>
 
-<form method="GET">
-    <div class="mb-3">
-        <label class="form-label">Choose Genre</label>
-        <select class="form-select" name="genre">
-            <option value="">All</option>
-            <option value="Action">Action</option>
-            <option value="Romance">Romance</option>
-            <option value="Sci-Fi">Sci-Fi</option>
-            <option value="Drama">Drama</option>
-            <option value="Comedy">Comedy</option>
-        </select>
+                <p class="small-text">{{ movie.description[:120] }}...</p>
+
+                <div class="button-group">
+                    <a href="{{ url_for('add_to_watchlist', movie_id=movie.id) }}" 
+                       class="button primary">
+                       Add to Watchlist
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
     </div>
-
-    <button class="btn btn-success">Get Recommendations</button>
-</form>
-
-<hr>
-
-{% if movies %}
-<div class="row">
-    {% for movie in movies %}
-    <div class="col-md-4 mb-4">
-        <div class="card bg-secondary text-light p-3">
-            <h4>{{ movie.movie_name }}</h4>
-            <p><strong>Genre:</strong> {{ movie.genre }}</p>
-            <p><strong>Rating:</strong> ⭐ {{ movie.rating }}/10</p>
-        </div>
-    </div>
-    {% endfor %}
-</div>
+{% else %}
+    <p>No recommendations available.</p>
 {% endif %}
 
 {% endblock %}
