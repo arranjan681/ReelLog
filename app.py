@@ -144,3 +144,178 @@ def logout():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    # -------------------------
+# ROUTES
+# -------------------------
+
+@app.route("/")
+def home():
+    return redirect(url_for("login"))
+
+
+# REGISTER
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+
+        user = User(username=form.username.data,
+                    email=form.email.data)
+        user.set_password(form.password.data)
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash("Account created! Please login.")
+        return redirect(url_for("login"))
+
+    return render_template("register.html", form=form)
+
+
+# LOGIN
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            return redirect(url_for("dashboard"))
+        else:
+            flash("Invalid email or password")
+
+    return render_template("login.html", form=form)
+
+
+# LOGOUT
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
+
+# DASHBOARD
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    return render_template("dashboard.html")
+
+
+# ADD MOVIE
+@app.route("/add", methods=["GET", "POST"])
+@login_required
+def add_movie():
+    form = MovieForm()
+
+    if form.validate_on_submit():
+        movie = Movie(
+            title=form.title.data,
+            genre=form.genre.data,
+            rating=form.rating.data,
+            poster=form.poster.data,
+            description=form.description.data,
+            user_id=current_user.id
+        )
+        db.session.add(movie)
+        db.session.commit()
+
+        flash("Movie added!")
+        return redirect(url_for("movies"))
+
+    return render_template("add_movie.html", form=form)
+
+
+# VIEW ALL MOVIES
+@app.route("/movies")
+@login_required
+def movies():
+    all_movies = Movie.query.filter_by(user_id=current_user.id).all()
+    return render_template("movies.html", movies=all_movies)
+
+
+# MOVIE DETAILS
+@app.route("/movie/<int:movie_id>")
+@login_required
+def movie_details(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    return render_template("movie_details.html", movie=movie)
+
+
+# DELETE MOVIE
+@app.route("/delete/<int:movie_id>")
+@login_required
+def delete_movie(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+
+    if movie.user_id != current_user.id:
+        flash("Unauthorized action!")
+        return redirect(url_for("movies"))
+
+    db.session.delete(movie)
+    db.session.commit()
+
+    flash("Movie deleted")
+    return redirect(url_for("movies"))
+
+
+# WATCHLIST
+watchlist_data = []
+
+@app.route("/add_watchlist/<int:movie_id>")
+@login_required
+def add_to_watchlist(movie_id):
+    if movie_id not in watchlist_data:
+        watchlist_data.append(movie_id)
+        flash("Added to watchlist!")
+    return redirect(url_for("watchlist"))
+
+
+@app.route("/watchlist")
+@login_required
+def watchlist():
+    movies = Movie.query.filter(Movie.id.in_(watchlist_data)).all()
+    return render_template("watchlist.html", movies=movies)
+
+
+# SEARCH PAGE
+@app.route("/search", methods=["GET", "POST"])
+@login_required
+def search():
+    form = SearchForm()
+    movies = []
+
+    if form.validate_on_submit():
+        title = form.search.data
+        genre = form.genre.data
+
+        query = Movie.query.filter_by(user_id=current_user.id)
+
+        if title:
+            query = query.filter(Movie.title.ilike(f"%{title}%"))
+
+        if genre != "All":
+            query = query.filter_by(genre=genre)
+
+        movies = query.all()
+
+    return render_template("search.html", form=form, movies=movies)
+
+
+# RECOMMENDATIONS
+@app.route("/recommendations")
+@login_required
+def recommendations():
+    movies = Movie.query.filter_by(genre="Action").limit(6).all()
+    return render_template("recommendations.html", movies=movies)
+
+
+# -------------------------
+# RUN
+# -------------------------
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
