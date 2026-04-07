@@ -1,60 +1,77 @@
+/* Dark background */
 body {
-    background: linear-gradient(135deg, #0b0b1f, #16163a);
-    color: white;
-    min-height: 100vh;
-    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-h1, h2, h4, h5 {
-    color: white;
-}
-
-.form-box,
-.stats-box,
-.watch-item,
-.movie-card {
-    background: rgba(255, 255, 255, 0.08);
-    padding: 20px;
+/* Card styling */
+.card {
+    border: none;
     border-radius: 12px;
-    margin-bottom: 20px;
+    background-color: #1e1e1e !important;
 }
 
-.form-control,
-.form-select {
-    margin-bottom: 10px;
+/* Buttons */
+.btn {
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 500;
 }
 
-.movie-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+/* Navbar */
+.navbar {
+    background-color: #000000 !important;
+    padding: 15px;
 }
 
-.movie-poster {
-    width: 100%;
-    height: 320px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin-bottom: 15px;
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.4rem;
 }
 
-.poster-placeholder {
-    width: 100%;
-    height: 320px;
-    background: #2a2a50;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 60px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-}
-
-.movie-content p {
-    margin-bottom: 8px;
-}
-
-.navbar-brand,
 .nav-link {
-    color: white !important;
+    color: #bbbbbb !important;
+    margin-left: 15px;
+    transition: 0.2s;
+}
+
+.nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* Form inputs */
+.form-control {
+    background-color: #222;
+    border: 1px solid #444;
+    color: white;
+    padding: 12px;
+}
+
+.form-control:focus {
+    background-color: #2b2b2b;
+    color: white;
+    border-color: #6c63ff;
+    box-shadow: none;
+}
+
+/* Movie cards */
+.card h4 {
+    font-weight: bold;
+}
+
+.card p {
+    margin: 0;
+}
+
+/* Flash messages */
+.alert {
+    border-radius: 8px;
+}
+
+/* Responsive cards */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 20px;
+    }
 }
