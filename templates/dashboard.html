@@ -1,31 +1,67 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
 {% block content %}
+<div class="dashboard-container">
 
-<h2 class="mb-4">Welcome, {{ current_user.username }} 👋</h2>
+    <h2 class="page-title">Dashboard</h2>
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="card bg-secondary text-light p-3">
-            <h4>Total Movies</h4>
-            <h2>{{ total_movies }}</h2>
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Movies</h3>
+            <p>{{ total_movies }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Upcoming Movies</h3>
+            <p>{{ upcoming_movies }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Released Movies</h3>
+            <p>{{ released_movies }}</p>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card bg-secondary text-light p-3">
-            <h4>Watchlist Items</h4>
-            <h2>{{ total_watchlist }}</h2>
-        </div>
+    <!-- Button -->
+    <div class="action-btn">
+        <a href="{{ url_for('add_movie') }}" class="button primary">+ Add Movie</a>
     </div>
+
+    <!-- Movie list -->
+    <div class="movie-list-section">
+        <h3>All Movies</h3>
+
+        {% if movies %}
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Release Date</th>
+                    <th>Rating</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movie in movies %}
+                <tr>
+                    <td>{{ movie.title }}</td>
+                    <td>{{ movie.release_date }}</td>
+                    <td>{{ movie.rating }}/10</td>
+                    <td>
+                        <a href="{{ url_for('edit_movie', movie_id=movie.id) }}" class="button small">Edit</a>
+                        <a href="{{ url_for('delete_movie', movie_id=movie.id) }}" class="button small danger"
+                           onclick="return confirm('Delete this movie?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p>No movies added yet.</p>
+        {% endif %}
+    </div>
+
 </div>
-
-<hr class="my-4">
-
-<h4>Quick Actions</h4>
-
-<a href="{{ url_for('add_movie') }}" class="btn btn-primary me-2">Add Movie</a>
-<a href="{{ url_for('movies') }}" class="btn btn-warning me-2">My Movies</a>
-<a href="{{ url_for('watchlist') }}" class="btn btn-info me-2">Watchlist</a>
-<a href="{{ url_for('recommendations') }}" class="btn btn-success">Recommendations</a>
-
 {% endblock %}
