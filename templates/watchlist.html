@@ -1,43 +1,39 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="form-box">
-    <h2>Watchlist</h2>
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
+<h2 class="mb-3">My Watchlist</h2>
 
-        <div class="mb-3">
-            {{ form.movie_name.label(class="form-label") }}
-            {{ form.movie_name(class="form-control", placeholder="Movie name") }}
-        </div>
+<form method="POST">
+    {{ form.hidden_tag() }}
 
-        <div class="mb-3">
-            {{ form.genre.label(class="form-label") }}
-            {{ form.genre(class="form-control", placeholder="Genre") }}
-        </div>
+    <div class="mb-3">
+        {{ form.movie_name.label(class="form-label") }}
+        {{ form.movie_name(class="form-control") }}
+    </div>
 
-        <div class="mb-3">
-            {{ form.release_year.label(class="form-label") }}
-            {{ form.release_year(class="form-control", placeholder="Release year") }}
-        </div>
+    <div class="mb-3">
+        {{ form.genre.label(class="form-label") }}
+        {{ form.genre(class="form-control") }}
+    </div>
 
-        {{ form.submit(class="btn btn-warning") }}
-    </form>
-</div>
+    <button class="btn btn-primary">Add to Watchlist</button>
+</form>
 
 <hr>
 
-{% for item in items %}
-<div class="watch-item">
-    <h5>{{ item.movie_name }}</h5>
-    <p>Genre: {{ item.genre }}</p>
-    <p>Year: {{ item.release_year }}</p>
-    <p>Added: {{ item.added_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
-    <a href="{{ url_for('delete_watchlist', id=item.id) }}" class="btn btn-danger btn-sm">Remove</a>
+{% if watchlist %}
+<div class="row">
+    {% for item in watchlist %}
+    <div class="col-md-4 mb-3">
+        <div class="card bg-secondary text-light p-3">
+            <h4>{{ item.movie_name }}</h4>
+            <p><strong>Genre:</strong> {{ item.genre }}</p>
+        </div>
+    </div>
+    {% endfor %}
 </div>
-{% endfor %}
-
-{% if not items %}
-<p>Your watchlist is empty.</p>
+{% else %}
+<p>No watchlist items yet.</p>
 {% endif %}
+
 {% endblock %}
