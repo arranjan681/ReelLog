@@ -2,52 +2,22 @@
 {% block content %}
 
 <div class="movie-details">
-    <div class="poster-box">
-        {% if movie.poster %}
-            <img src="{{ movie.poster }}" class="movie-poster-large">
-        {% else %}
-            <img src="{{ url_for('static', filename='default_poster.jpg') }}" class="movie-poster-large">
-        {% endif %}
-    </div>
+    <img src="{{ movie.poster or url_for('static', filename='default_poster.jpg') }}"
+         class="movie-poster-large">
 
     <div class="info-box">
-        <h2 class="movie-title">{{ movie.title }}</h2>
+        <h2>{{ movie.title }}</h2>
+        <p>{{ movie.description }}</p>
 
-        <p class="movie-description">
-            {{ movie.description or "No description available." }}
-        </p>
-
-        <!-- Star Rating -->
         <div class="star-rating">
-            {% for _ in range(movie.rating) %}
-                ⭐
-            {% endfor %}
-            {% for _ in range(5 - movie.rating) %}
-                ☆
-            {% endfor %}
+            {% for _ in range(movie.rating) %} ⭐ {% endfor %}
+            {% for _ in range(5 - movie.rating) %} ☆ {% endfor %}
         </div>
 
-        <p class="rating-text">Rating: {{ movie.rating }}/5</p>
-
-        <!-- Action Buttons -->
         <div class="action-buttons">
-
-            <a href="{{ url_for('add_to_watchlist', movie_id=movie.id) }}" 
-               class="button primary">
-               ➕ Add to Watchlist
-            </a>
-
-            <a href="{{ url_for('movies') }}" 
-               class="button secondary">
-               ⬅ Back to Movies
-            </a>
-
-            <a href="{{ url_for('delete_movie', movie_id=movie.id) }}" 
-               class="button danger">
-               🗑 Delete
-            </a>
+            <a href="{{ url_for('add_to_watchlist', movie_id=movie.id) }}" class="btn btn-warning">Add to Watchlist</a>
+            <a href="{{ url_for('movies') }}" class="btn btn-secondary">Back</a>
         </div>
-
     </div>
 </div>
 
