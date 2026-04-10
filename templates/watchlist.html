@@ -1,33 +1,24 @@
-{% extends "base.html" %}
-{% block title %}Watchlist{% endblock %}
-
+{% extends 'base.html' %}
 {% block content %}
-<h2 class="page-title">Your Watchlist</h2>
 
-{% if watchlist %}
-    <div class="movie-grid">
-        {% for movie in watchlist %}
-            <div class="card movie-card">
-                <h3>{{ movie.title }}</h3>
+<h2 class="page-title">⭐ Watchlist</h2>
 
-                <p class="small-text">{{ movie.description[:120] }}...</p>
+<div class="movies-grid">
+    {% for movie in movies %}
+    <div class="movie-card">
 
-                <div class="button-group">
-                    <a href="{{ url_for('movie_details', movie_id=movie.id) }}" 
-                       class="button primary">
-                       View
-                    </a>
+        <img src="{{ movie.poster or url_for('static', filename='default_poster.jpg') }}"
+             class="movie-poster">
 
-                    <a href="{{ url_for('remove_watchlist', movie_id=movie.id) }}"
-                       class="button danger">
-                       Remove
-                    </a>
-                </div>
-            </div>
-        {% endfor %}
+        <h4>{{ movie.title }}</h4>
+
+        <a href="{{ url_for('movie_details', movie_id=movie.id) }}" 
+           class="btn btn-outline-primary mt-2 w-100">
+           View Details
+        </a>
+
     </div>
-{% else %}
-    <p>Your watchlist is empty.</p>
-{% endif %}
+    {% endfor %}
+</div>
 
 {% endblock %}
