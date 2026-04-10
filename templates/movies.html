@@ -1,33 +1,30 @@
-{% extends "base.html" %}
-{% block title %}My Movies{% endblock %}
-
+{% extends 'base.html' %}
 {% block content %}
+
 <h2 class="page-title">My Movies</h2>
 
-<a href="{{ url_for('add_movie') }}" class="button primary mb-3">+ Add New Movie</a>
+<div class="movies-grid">
+    {% for movie in movies %}
+    <div class="movie-card">
 
-{% if movies %}
-    <div class="movie-grid">
-        {% for movie in movies %}
-            <div class="card movie-card">
+        <img src="{{ movie.poster or url_for('static', filename='default_poster.jpg') }}"
+             class="movie-poster">
 
-                <h3>{{ movie.title }}</h3>
+        <h4>{{ movie.title }}</h4>
+        <p class="genre">{{ movie.genre }}</p>
 
-                <p class="small-text">{{ movie.description[:120] }}...</p>
+        <div class="star-rating">
+            {% for _ in range(movie.rating) %} ⭐ {% endfor %}
+            {% for _ in range(5 - movie.rating) %} ☆ {% endfor %}
+        </div>
 
-                <p><strong>Rating:</strong> ⭐ {{ movie.rating }}</p>
+        <a href="{{ url_for('movie_details', movie_id=movie.id) }}" 
+           class="btn btn-outline-primary w-100 mt-2">
+             View Details
+        </a>
 
-                <div class="button-group">
-                    <a href="{{ url_for('movie_details', movie_id=movie.id) }}" class="button primary">View</a>
-
-                    <a href="{{ url_for('edit_movie', movie_id=movie.id) }}" class="button secondary">Edit</a>
-                </div>
-
-            </div>
-        {% endfor %}
     </div>
-{% else %}
-    <p>No movies added yet.</p>
-{% endif %}
+    {% endfor %}
+</div>
 
 {% endblock %}
