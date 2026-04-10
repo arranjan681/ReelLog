@@ -1,67 +1,25 @@
-{% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
-
+{% extends 'base.html' %}
 {% block content %}
-<div class="dashboard-container">
 
-    <h2 class="page-title">Dashboard</h2>
+<h2 class="page-title">Register</h2>
 
-    <!-- Stats -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <h3>Total Movies</h3>
-            <p>{{ total_movies }}</p>
-        </div>
+<form method="POST" class="form-box">
+    {{ form.hidden_tag() }}
 
-        <div class="stat-card">
-            <h3>Upcoming Movies</h3>
-            <p>{{ upcoming_movies }}</p>
-        </div>
+    <label>Username</label>
+    {{ form.username(class="form-control") }}
 
-        <div class="stat-card">
-            <h3>Released Movies</h3>
-            <p>{{ released_movies }}</p>
-        </div>
-    </div>
+    <label class="mt-2">Email</label>
+    {{ form.email(class="form-control") }}
 
-    <!-- Button -->
-    <div class="action-btn">
-        <a href="{{ url_for('add_movie') }}" class="button primary">+ Add Movie</a>
-    </div>
+    <label class="mt-2">Password</label>
+    {{ form.password(class="form-control") }}
 
-    <!-- Movie list -->
-    <div class="movie-list-section">
-        <h3>All Movies</h3>
+    <button class="btn btn-success w-100 mt-3">Register</button>
 
-        {% if movies %}
-        <table class="styled-table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Release Date</th>
-                    <th>Rating</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for movie in movies %}
-                <tr>
-                    <td>{{ movie.title }}</td>
-                    <td>{{ movie.release_date }}</td>
-                    <td>{{ movie.rating }}/10</td>
-                    <td>
-                        <a href="{{ url_for('edit_movie', movie_id=movie.id) }}" class="button small">Edit</a>
-                        <a href="{{ url_for('delete_movie', movie_id=movie.id) }}" class="button small danger"
-                           onclick="return confirm('Delete this movie?')">Delete</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-            <p>No movies added yet.</p>
-        {% endif %}
-    </div>
+    <p class="text-center mt-3">
+        Already have an account? <a href="{{ url_for('login') }}">Login</a>
+    </p>
+</form>
 
-</div>
 {% endblock %}
